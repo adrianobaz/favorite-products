@@ -1,5 +1,7 @@
-package com.magalu.favoriteproducts.domain
+package com.magalu.favoriteproducts.domain.service
 
+import com.magalu.favoriteproducts.domain.ClientsPort
+import com.magalu.favoriteproducts.domain.ClientsTokenPort
 import com.magalu.favoriteproducts.domain.exception.BusinessRuleViolationException
 import com.magalu.favoriteproducts.domain.exception.ErrorCode
 import com.magalu.favoriteproducts.domain.exception.ResourceNotFoundException

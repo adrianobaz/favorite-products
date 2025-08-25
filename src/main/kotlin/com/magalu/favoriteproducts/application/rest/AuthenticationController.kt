@@ -5,8 +5,9 @@ import com.magalu.favoriteproducts.application.rest.ClientFavoriteProductsContro
 import com.magalu.favoriteproducts.application.security.JwtHandler
 import com.magalu.favoriteproducts.application.security.JwtResponse
 import com.magalu.favoriteproducts.application.security.TokenRequest
-import com.magalu.favoriteproducts.domain.ClientsService
+import com.magalu.favoriteproducts.domain.service.ClientsService
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.swagger.v3.oas.annotations.Operation
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
@@ -37,6 +38,10 @@ class AuthenticationController(
     private val jwtProps: JwtProperties,
     @param:Value("\${app.magic-link.ttl-minutes}") private val magicTtl: Long,
 ) {
+    @Operation(
+        summary = "Gerar um token para autenticação do cliente",
+        description = "Realiza a geração do token JWT do cliente. Necessario enviar o ID externo do mesmo",
+    )
     @PostMapping("/token/request")
     fun request(
         request: HttpServletRequest,
@@ -57,6 +62,10 @@ class AuthenticationController(
         return ResponseEntity.status(HttpStatus.SEE_OTHER).headers(headers).build()
     }
 
+    @Operation(
+        summary = "Obtem o token JWT contendo as informações do cliente para fins de autenticação/autorização",
+        description = "Realiza a obtenção do token JWT do cliente. Necessario enviar o token gerado na geração do mesmo via link mágico",
+    )
     @GetMapping(PATH_CONSUME_TOKEN)
     fun consume(
         @NotBlank

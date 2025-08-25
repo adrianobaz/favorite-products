@@ -1,9 +1,12 @@
-package com.magalu.favoriteproducts.domain
+package com.magalu.favoriteproducts.domain.service
 
-import com.magalu.favoriteproducts.domain.ClientsService.Companion.CLIENTS_RESOURCE_NAME
+import com.magalu.favoriteproducts.domain.ClientsPort
+import com.magalu.favoriteproducts.domain.ProductsIntegrationPort
+import com.magalu.favoriteproducts.domain.ProductsPort
 import com.magalu.favoriteproducts.domain.exception.ResourceNotFoundException
 import com.magalu.favoriteproducts.domain.model.Client
 import com.magalu.favoriteproducts.domain.model.Product
+import com.magalu.favoriteproducts.domain.service.ClientsService.Companion.CLIENTS_RESOURCE_NAME
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.transaction.support.TransactionTemplate
 import java.util.UUID
