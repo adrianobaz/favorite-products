@@ -1,0 +1,84 @@
+server:
+  port: 8080
+  shutdown: graceful
+spring:
+  application:
+    name: favorite-products
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+  ## DataSource properties
+  datasource:
+    url: jdbc:postgresql://localhost:5432/favorite_products_db_dev
+    username: postgres
+    password: postgres
+    ## HikariCP configuration
+    hikari:
+      minimum-idle: 0
+      maximum-pool-size: 25
+      max-life-time: 900000
+      transaction-isolation: TRANSACTION_READ_COMMITTED
+      connection-timeout: 20000
+      auto-commit: false
+      data-source-properties:
+        preparedStatementCacheSize: 500
+        preparedStatementCacheSqlLimit: 1024
+  jpa:
+    show-sql: false
+    open-in-view: false
+    ## Hibernate properties
+    hibernate:
+      ddl-auto: none
+      format_sql: true
+    properties:
+      hibernate:
+        generate_statistics: false
+        order_inserts: true
+        order_updates: true
+        jdbc:
+          time_zone: UTC
+          batch_size: 25
+          batch_versioned_data: true
+        connection:
+          provider_disables_autocommit: true
+        query:
+          in_clause_parameter_padding: true
+          fail_on_pagination_over_collection_fetch: true
+          plan_cache_max_size: 4096
+  flyway:
+    enabled: true
+  redis:
+    host: localhost
+    port: 6379
+
+feign:
+  okhttp:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: full
+
+
+app:
+  infrastructure:
+    fake-store:
+      url: https://fakestoreapi.com/products
+  jwt:
+    secret: npY7MvZ4fepjJeMLRwF5yVA0npkDNmbwnwAp95Vjbdk= # openssl rand -base64 32
+    issuer: ${spring.application.name}
+    expiration-minutes: 30
+  magic-link:
+    ttl-minutes: 10
+
+logging:
+  level:
+    root: INFO
+    net:
+      ttddyy:
+        dsproxy:
+          listener: DEBUG
+    feign: DEBUG
+    feign.client: DEBUG
