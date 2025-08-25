@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding
 import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
-@ConfigurationPropertiesScan(basePackageClasses = [JwtProperties::class])
+@ConfigurationPropertiesScan(basePackageClasses = [JwtProperties::class, CachingAsideProperties::class])
 class ExternalPropertiesConfig
 
 @ConfigurationProperties("app.jwt")
@@ -16,4 +16,11 @@ data class JwtProperties
         val secret: String,
         val issuer: String,
         val expirationMinutes: Long,
+    )
+
+@ConfigurationProperties("app.caching")
+data class CachingAsideProperties
+    @ConstructorBinding
+    constructor(
+        val keys: Map<String, Long>,
     )

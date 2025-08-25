@@ -65,13 +65,26 @@ feign:
 app:
   infrastructure:
     fake-store:
-      url: https://fakestoreapi.com/products
+      url: https://fakestoreapi.com
   jwt:
     secret: npY7MvZ4fepjJeMLRwF5yVA0npkDNmbwnwAp95Vjbdk= # openssl rand -base64 32
     issuer: ${spring.application.name}
     expiration-minutes: 30
   magic-link:
     ttl-minutes: 10
+  caching:
+    keys:
+      products:
+        ttl-minutes: 5
+
+springdoc:
+  api-docs:
+    path: /docs/api-docs.json
+    enabled: true
+  swagger-ui:
+    path: /docs
+    enabled: true
+  show-actuator: true
 
 logging:
   level:
@@ -80,5 +93,8 @@ logging:
       ttddyy:
         dsproxy:
           listener: DEBUG
+    org:
+      springframework:
+        security: DEBUG
     feign: DEBUG
     feign.client: DEBUG

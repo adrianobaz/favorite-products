@@ -22,7 +22,7 @@ fun Client.toResponse(withFavoriteProducts: Boolean = false) =
         this.favoriteProducts?.takeIf { withFavoriteProducts }.toResponse(),
     )
 
-fun Set<Product>?.toResponse() = this?.toList()?.map { it.toResponse() }
+fun Set<Product>?.toResponse() = this?.toList()?.map { it.toResponse() } ?: listOf()
 
 fun Product.toResponse() =
     ProductResponse(

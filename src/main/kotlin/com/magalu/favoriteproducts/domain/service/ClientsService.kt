@@ -1,5 +1,7 @@
-package com.magalu.favoriteproducts.domain
+package com.magalu.favoriteproducts.domain.service
 
+import com.magalu.favoriteproducts.domain.ClientsPort
+import com.magalu.favoriteproducts.domain.ClientsTokenPort
 import com.magalu.favoriteproducts.domain.exception.BusinessRuleViolationException
 import com.magalu.favoriteproducts.domain.exception.ErrorCode
 import com.magalu.favoriteproducts.domain.exception.ResourceNotFoundException
@@ -26,7 +28,7 @@ class ClientsService(
             }
 
             if (clientsPort.existsByEmail(client.email)) {
-                clientsTokenPort.putEmail(client.email)
+                clientsTokenPort.setEmail(client.email)
                 BusinessRuleViolationException(
                     ErrorCode.EMAIL_ALREADY_REGISTERED.message,
                     ErrorCode.EMAIL_ALREADY_REGISTERED.name,
@@ -34,7 +36,7 @@ class ClientsService(
             }
             clientsPort.create(client.copy(createdAt = now, updatedAt = now))
         }.onSuccess {
-            clientsTokenPort.putEmail(it.email)
+            clientsTokenPort.setEmail(it.email)
             logger.info { "Successfully create client=[${it.externalId}]" }
         }.getOrElse {
             logger.info { "Error on create client=[${client.email}] | Error=[${it.message}]" }
@@ -45,36 +47,42 @@ class ClientsService(
         externalId: UUID,
         name: String?,
         email: String?,
-    ): Client =
-        runCatching {
-            val now = OffsetDateTime.now()
-            val client = searchByExternalId(externalId)
-            val nameToUpdate = name ?: client.name
-            if (email != null && (clientsTokenPort.emailAlreadyExists(email) || clientsPort.existsByEmail(email))) {
-                throw BusinessRuleViolationException(
-                    ErrorCode.EMAIL_ALREADY_REGISTERED.message,
-                    ErrorCode.EMAIL_ALREADY_REGISTERED.name,
-                )
-            }
-            val emailToUpdate = email ?: client.email
-            clientsPort.updateByOnly(client.externalId, nameToUpdate, emailToUpdate, now)
-        }.onSuccess {
-            val result =
-                if (email != it.email) {
-                    val isRemoved = clientsTokenPort.removeEmail(it.email)
-                    val isSet = clientsTokenPort.putEmail(it.email)
-                    isRemoved && isSet
-                } else {
-                    true
+    ): Client {
+        val result =
+            runCatching {
+                val now = OffsetDateTime.now()
+                val client = searchByExternalId(externalId)
+                val nameToUpdate = name ?: client.name
+                if (email != null && clientsTokenPort.emailAlreadyExists(email)) {
+                    throw BusinessRuleViolationException(
+                        ErrorCode.EMAIL_ALREADY_REGISTERED.message,
+                        ErrorCode.EMAIL_ALREADY_REGISTERED.name,
+                    )
                 }
-            logger.info { "Successfully update client=[$externalId] | From cache: $result" }
-        }.getOrElse {
-            logger.info { "Error on update client=[$externalId] | Error=[${it.message}]" }
-            throw it
-        }
+                val emailToUpdate = email ?: client.email
+                val newClient = clientsPort.updateByOnly(client.externalId, nameToUpdate, emailToUpdate, now)
+                Pair(newClient, client)
+            }.onSuccess {
+                val result =
+                    if (it.first.email != it.second.email) {
+                        val isRemoved = clientsTokenPort.removeEmail(it.second.email)
+                        val isSet = clientsTokenPort.setEmail(it.first.email)
+                        isRemoved && isSet
+                    } else {
+                        true
+                    }
+                logger.info { "Successfully update client=[$externalId] | From cache: $result" }
+            }.getOrElse {
+                logger.info { "Error on update client=[$externalId] | Error=[${it.message}]" }
+                throw it
+            }
+        return result.first
+    }
 
     fun searchByExternalId(externalId: UUID): Client =
-        clientsPort.search(externalId) ?: throw ResourceNotFoundException(CLIENTS_RESOURCE_NAME, externalId)
+        clientsPort.search(externalId)?.let {
+            it.also { clientsTokenPort.setEmail(it.email) }
+        } ?: throw ResourceNotFoundException(CLIENTS_RESOURCE_NAME, externalId)
 
     fun deleteByExternalId(externalId: UUID) {
         runCatching {

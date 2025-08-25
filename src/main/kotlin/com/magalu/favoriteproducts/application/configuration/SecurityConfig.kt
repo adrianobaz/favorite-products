@@ -20,15 +20,21 @@ class SecurityConfig(
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { it.disable() }
+            .cors { }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/auth/**")
-                    .permitAll()
+                    .requestMatchers(
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/swagger-resources/**",
+                        "/docs/**",
+                        "/docs/api-docs.json",
+                        "/actuator/health",
+                        "/auth/**"
+                    ).permitAll()
                     .requestMatchers(HttpMethod.POST, "/v1/clients")
                     .permitAll()
-                    .requestMatchers("/admin/**")
-                    .hasRole("ADMIN")
                     .anyRequest()
                     .authenticated()
             }.addFilterBefore(JwtAuthFilter(jwtHandler), UsernamePasswordAuthenticationFilter::class.java)
