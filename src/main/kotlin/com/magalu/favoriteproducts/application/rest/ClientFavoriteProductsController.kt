@@ -7,6 +7,9 @@ import com.magalu.favoriteproducts.application.rest.response.ClientResponse
 import com.magalu.favoriteproducts.application.rest.response.ProductResponse
 import com.magalu.favoriteproducts.domain.ClientsService
 import com.magalu.favoriteproducts.domain.FavoriteProductsService
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -30,7 +33,7 @@ class ClientFavoriteProductsController(
 ) {
     @PostMapping(produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun create(
-        @RequestBody clientRequest: ClientRequest,
+        @Valid @RequestBody clientRequest: ClientRequest,
     ): ResponseEntity<ClientResponse> {
         val client = clientsService.create(clientRequest.toDomain())
         val location =
@@ -44,6 +47,11 @@ class ClientFavoriteProductsController(
 
     @GetMapping("/{externalId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getByExternalId(
+        @NotBlank
+        @Pattern(
+            regexp = UUIDV4_REGEX,
+            message = "Invalid UUIDv4 format",
+        )
         @PathVariable("externalId") externalId: String,
     ): ResponseEntity<ClientResponse> =
         ResponseEntity.ok(
@@ -52,8 +60,13 @@ class ClientFavoriteProductsController(
 
     @PatchMapping("/{externalId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun update(
+        @NotBlank
+        @Pattern(
+            regexp = UUIDV4_REGEX,
+            message = "Invalid UUIDv4 format",
+        )
         @PathVariable("externalId") clientExternalId: String,
-        @RequestBody clientUpdateRequest: ClientUpdateRequest,
+        @Valid @RequestBody clientUpdateRequest: ClientUpdateRequest,
     ): ResponseEntity<ClientResponse> =
         ResponseEntity.ok(
             clientsService.update(UUID.fromString(clientExternalId), clientUpdateRequest.name, clientUpdateRequest.email).toResponse(),
@@ -61,6 +74,11 @@ class ClientFavoriteProductsController(
 
     @DeleteMapping("/{externalId}")
     fun deleteClientByExternalId(
+        @NotBlank
+        @Pattern(
+            regexp = UUIDV4_REGEX,
+            message = "Invalid UUIDv4 format",
+        )
         @PathVariable("externalId") externalId: String,
     ): ResponseEntity<Any> {
         clientsService.deleteByExternalId(UUID.fromString(externalId))
@@ -73,8 +91,13 @@ class ClientFavoriteProductsController(
         consumes = [MediaType.APPLICATION_JSON_VALUE],
     )
     fun addFavoriteProducts(
+        @NotBlank
+        @Pattern(
+            regexp = UUIDV4_REGEX,
+            message = "Invalid UUIDv4 format",
+        )
         @PathVariable("externalId") clientExternalId: String,
-        @RequestBody favoriteProductsRequest: FavoriteProductsRequest,
+        @Valid @RequestBody favoriteProductsRequest: FavoriteProductsRequest,
     ): ResponseEntity<List<ProductResponse>> {
         val client =
             favoriteProductsService.addFavoriteProducts(
@@ -86,9 +109,18 @@ class ClientFavoriteProductsController(
 
     @GetMapping("/{externalId}/favorite-products", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getFavoriteProducts(
+        @NotBlank
+        @Pattern(
+            regexp = UUIDV4_REGEX,
+            message = "Invalid UUIDv4 format",
+        )
         @PathVariable("externalId") clientExternalId: String,
     ): ResponseEntity<List<ProductResponse>> {
         val client = favoriteProductsService.searchAllFavoriteProductsBy(UUID.fromString(clientExternalId))
         return ResponseEntity.ok(client.favoriteProducts.toResponse())
+    }
+
+    companion object {
+        const val UUIDV4_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
     }
 }

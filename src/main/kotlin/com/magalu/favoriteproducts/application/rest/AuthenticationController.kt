@@ -1,12 +1,16 @@
 package com.magalu.favoriteproducts.application.rest
 
 import com.magalu.favoriteproducts.application.configuration.JwtProperties
+import com.magalu.favoriteproducts.application.rest.ClientFavoriteProductsController.Companion.UUIDV4_REGEX
 import com.magalu.favoriteproducts.application.security.JwtHandler
 import com.magalu.favoriteproducts.application.security.JwtResponse
 import com.magalu.favoriteproducts.application.security.TokenRequest
 import com.magalu.favoriteproducts.domain.ClientsService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -36,7 +40,7 @@ class AuthenticationController(
     @PostMapping("/token/request")
     fun request(
         request: HttpServletRequest,
-        @RequestBody req: TokenRequest,
+        @Valid @RequestBody req: TokenRequest,
     ): ResponseEntity<Any> {
         val client = clientsService.searchByExternalId(UUID.fromString(req.externalId))
 
@@ -55,7 +59,12 @@ class AuthenticationController(
 
     @GetMapping(PATH_CONSUME_TOKEN)
     fun consume(
-        @RequestParam token: String,
+        @NotBlank
+        @Pattern(
+            regexp = UUIDV4_REGEX,
+            message = "Invalid UUIDv4 format",
+        )
+        @RequestParam("token") token: String,
     ): ResponseEntity<JwtResponse> {
         val client = clientsService.consumeMagicToken(token)
         val jwt = jwtHandler.generateToken(client)

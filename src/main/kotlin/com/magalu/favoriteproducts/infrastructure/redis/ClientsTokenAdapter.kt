@@ -17,7 +17,7 @@ class ClientsTokenAdapter(
     private val clientStorageAdapter: ClientStorageAdapter,
     private val redisTemplate: RedisTemplate<String, Any>,
 ) : ClientsTokenPort {
-    override fun putEmail(email: String): Boolean {
+    override fun setEmail(email: String): Boolean {
         val key = "$EMAIL_PREFIX$email"
         runCatching {
             redisTemplate.opsForValue().set(key, email, Duration.ofMinutes(1))

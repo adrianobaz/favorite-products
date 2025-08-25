@@ -1,8 +1,10 @@
 package com.magalu.favoriteproducts.domain.model
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Product(
     val id: Long,
     val title: String,

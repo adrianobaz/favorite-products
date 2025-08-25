@@ -16,18 +16,7 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
-    command: [
-      "redis-server",
-      "--appendonly", "yes",
-      "--appendfsync", "everysec",
-      "--save", "",
-      "--maxmemory-policy", "noeviction",
-      "--io-threads", "4",
-      "--io-threads-do-reads", "yes",
-      "--loglevel", "warning",
-      "--timeout", "300",
-      "--tcp-backlog", "1024"
-    ]
+    command: [ "redis-server", "--appendonly", "yes", "--loglevel", "warning" ]
   haproxy:
     image: haproxy:3.1.8-alpine3.22
     container_name: haproxy-load-balancer-dev

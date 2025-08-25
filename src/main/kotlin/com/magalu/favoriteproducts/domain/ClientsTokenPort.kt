@@ -4,7 +4,7 @@ import com.magalu.favoriteproducts.domain.model.Client
 import java.util.UUID
 
 interface ClientsTokenPort {
-    fun putEmail(email: String): Boolean
+    fun setEmail(email: String): Boolean
 
     fun removeEmail(email: String): Boolean
 
