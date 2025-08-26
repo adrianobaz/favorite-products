@@ -109,7 +109,9 @@ class ClientFavoriteProductsController(
     @SecurityRequirement(name = "bearerAuth")
     @Operation(
         summary = "Adiciona produto(s) a lista de favoritos do cliente",
-        description = "Realiza a adição de produto(s) a lista de favoritos do cliente. Necessario passar a lista de produtos e o ID externo do cliente",
+        description =
+            "Realiza a adição de produto(s) a lista de favoritos do cliente. " +
+                "Necessario passar a lista de produtos e o ID externo do cliente",
     )
     @PostMapping(
         "/{externalId}/favorite-products",

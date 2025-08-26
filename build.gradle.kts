@@ -57,7 +57,6 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
 
     // HTTP Client
-//    implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     implementation("io.github.openfeign:feign-okhttp")
 

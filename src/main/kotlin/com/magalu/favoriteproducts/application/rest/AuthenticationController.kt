@@ -52,7 +52,7 @@ class AuthenticationController(
         val token = clientsService.createMagicToken(client.externalId, magicTtl)
         val scheme = request.scheme
         val serverName = request.serverName
-        val serverPort = request.serverPort
+        val serverPort = 8080
         val contextPath = request.contextPath
 
         val link = "$scheme://$serverName:$serverPort$contextPath$ROOT_PATH$PATH_CONSUME_TOKEN?token=$token"

@@ -31,7 +31,7 @@ class SecurityConfig(
                         "/docs/**",
                         "/docs/api-docs.json",
                         "/actuator/health",
-                        "/auth/**"
+                        "/auth/**",
                     ).permitAll()
                     .requestMatchers(HttpMethod.POST, "/v1/clients")
                     .permitAll()
