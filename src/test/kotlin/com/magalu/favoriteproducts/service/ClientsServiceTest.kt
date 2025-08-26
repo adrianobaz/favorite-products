@@ -13,8 +13,7 @@ import java.time.OffsetDateTime
 import kotlin.test.assertEquals
 
 class ClientsServiceTest {
-
-    private val clientsPort: ClientsPort =  mockk()
+    private val clientsPort: ClientsPort = mockk()
     private val clientsTokenPort: ClientsTokenPort = mockk()
     private val clientsService = ClientsService(clientsPort, clientsTokenPort)
 
@@ -27,7 +26,8 @@ class ClientsServiceTest {
         every { clientsTokenPort.emailAlreadyExists(client.email) } returns false
         every { clientsPort.existsByEmail(client.email) } returns false
 
-        every { clientsPort.create(capture(slotClient)) } returns client.copy(id = 1, createdAt = OffsetDateTime.now(), updatedAt = OffsetDateTime.now())
+        every { clientsPort.create(capture(slotClient)) } returns
+            client.copy(id = 1, createdAt = OffsetDateTime.now(), updatedAt = OffsetDateTime.now())
         every { clientsTokenPort.setEmail(client.email) } returns true
 
         val result = clientsService.create(client)
@@ -44,6 +44,5 @@ class ClientsServiceTest {
 
     @Test
     fun `should update client successfully`() {
-
     }
 }
